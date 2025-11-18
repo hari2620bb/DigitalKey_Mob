@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:clickable="true"
+android:focusable="true">
+
+<com.google.android.material.card.MaterialCardView
+    android:id="@+id/successCard"
+    android:layout_width="300dp"
+    android:layout_height="250dp"
+    android:layout_gravity="center"
+    android:layout_marginHorizontal="28dp"
+    android:padding="24dp"
+    android:maxWidth="620dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="10dp"
+    app:strokeColor="@android:color/transparent"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <FrameLayout
+            android:id="@+id/successCircle"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/bg_success_circle">
+
+            <ImageView
+                android:id="@+id/ivCheck"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+
+                android:src="@drawable/ic_check_white"
+                android:contentDescription="@string/success" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:accessibilityHeading="true"
+            android:text="@string/pairing_successfully"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+</FrameLayout>

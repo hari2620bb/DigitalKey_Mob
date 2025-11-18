@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1B294B"
+    tools:context=".PairingBondingActivity">
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_root"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">   <!-- ⬅️ add this line -->
+
+
+        <!-- Single direct child must wrap_content -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Header -->
+            <RelativeLayout
+                android:id="@+id/headerLayout"
+                android:layout_width="0dp"
+                android:layout_height="220dp"
+                android:paddingStart="24dp"
+                android:paddingTop="32dp"
+                android:paddingEnd="24dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/tvVehicleName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="XXXXXX"
+                    android:textColor="@android:color/white"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:id="@+id/tvVin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tvVehicleName"
+                    android:layout_alignStart="@id/tvVehicleName"
+                    android:text="5UWXWX7C5EA123456"
+                    android:textColor="#BFD0F0"
+                    android:textSize="16sp" />
+
+                <FrameLayout
+                    android:id="@+id/ivNotification"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/bg_outline_circle"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_bell_white"
+                        android:contentDescription="@string/notify" />
+                </FrameLayout>
+            </RelativeLayout>
+
+            <!-- Curved white sheet backdrop -->
+            <View
+                android:id="@+id/topCurve"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_top_curve"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/headerLayout" />
+
+            <!-- Vehicle card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardVehicle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="-40dp"
+                app:cardUseCompatPadding="true"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/headerLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingTop="36dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/btnManageDigitalKey"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:background="@drawable/bg_pill_white"
+                        android:elevation="8dp"
+                        android:paddingStart="22dp"
+                        android:paddingTop="12dp"
+                        android:paddingEnd="22dp"
+                        android:paddingBottom="12dp"
+                        android:text="Manage Digital Key"
+                        android:textColor="#446FBC"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <FrameLayout
+                        android:id="@+id/vehicleImageContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="280dp"
+                        android:layout_below="@id/btnManageDigitalKey"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="260dp"
+                            android:layout_height="260dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/bg_circles"
+                            android:contentDescription="@string/radar" />
+
+                        <ImageView
+                            android:id="@+id/ivVehicle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:alpha="0.18"
+                            android:src="@drawable/ic_truck"
+                            android:contentDescription="@string/vehicle" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/vehicleImageContainer"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_sparkle_off"
+                            android:tint="#98A2B3"
+                            android:contentDescription="@string/icon" />
+
+                        <TextView
+                            android:id="@+id/tvVehicleDetails"
+                            android:layout_width="10dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingStart="59dp"
+                            android:text="Vehicle Details"
+                            android:textColor="#98A2B3"
+                            android:textSize="18sp" />
+
+                        <ImageView
+                            android:id="@+id/ivEditVehicle"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_outline_circle"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_edit"
+                            android:tint="#446FBC"
+                            android:contentDescription="@string/edit" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- CTA -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartPairing"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:text="Start Pairing and Bonding"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                app:backgroundTint="#2F5EAA"
+                app:cornerRadius="22dp"
+                app:layout_constraintTop_toBottomOf="@id/cardVehicle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/tvSearching"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Searching for Vehicle..."
+                android:textColor="#000000"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@id/btnStartPairing"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Removed bottomNav + Space from inside scroll -->
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+<!--    &lt;!&ndash; Fixed bottom navigation (not part of scroll) &ndash;&gt;-->
+<!--    <LinearLayout-->
+<!--        android:id="@+id/bottomNav"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="64dp"-->
+<!--        android:paddingStart="28dp"-->
+<!--        android:paddingEnd="28dp"-->
+<!--        android:gravity="center"-->
+<!--        android:weightSum="4"-->
+<!--        android:background="@android:color/white"-->
+<!--        android:elevation="8dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent">-->
+
+<!--        <ImageView-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:src="@drawable/ic_home"-->
+<!--            android:tint="#4169E1"-->
+<!--            android:contentDescription="@string/home" />-->
+
+<!--        <ImageView-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:src="@drawable/ic_connect"-->
+<!--            android:tint="#C1C7D0"-->
+<!--            android:contentDescription="@string/connect" />-->
+
+<!--        <ImageView-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:src="@drawable/ic_key"-->
+<!--            android:tint="#C1C7D0"-->
+<!--            android:contentDescription="@string/keys" />-->
+
+<!--        <ImageView-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:src="@drawable/ic_profile"-->
+<!--            android:tint="#C1C7D0"-->
+<!--            android:contentDescription="@string/profile" />-->
+<!--    </LinearLayout>-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

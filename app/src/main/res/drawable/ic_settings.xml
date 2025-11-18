@@ -1,0 +1,40 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="44dp"
+    android:height="44dp"
+    android:viewportWidth="44"
+    android:viewportHeight="44">
+
+    <!-- Background circle with gradient border -->
+    <path
+        android:pathData="M22 0.25C34.0122 0.25 43.75 9.9878 43.75 22C43.75 34.0122 34.0122 43.75 22 43.75C9.9878 43.75 0.25 34.0122 0.25 22C0.25 9.9878 9.9878 0.25 22 0.25Z"
+        android:fillColor="#898989"
+        android:fillAlpha="0.05" />
+
+    <!-- Gradient border stroke -->
+    <path
+        android:pathData="M22 0.25C34.0122 0.25 43.75 9.9878 43.75 22C43.75 34.0122 34.0122 43.75 22 43.75C9.9878 43.75 0.25 34.0122 0.25 22C0.25 9.9878 9.9878 0.25 22 0.25Z"
+        android:strokeWidth="0.5"
+        android:strokeColor="#FF3878DB" />
+
+    <!-- Icon lines -->
+    <path
+        android:pathData="M21 27.5H14"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FF3878DB"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:pathData="M23 16.5H30"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FF3878DB"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:pathData="M18 22H30"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FF3878DB"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

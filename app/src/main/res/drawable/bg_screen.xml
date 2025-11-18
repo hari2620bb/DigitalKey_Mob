@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Deep navy base -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#0B111A"/>
+        </shape>
+    </item>
+
+    <!-- Top-left radial blue bloom -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:centerX="22"
+                android:centerY="10"
+                android:gradientRadius="700dp"
+                android:startColor="#2B62C6"
+                android:centerColor="#153A72"
+                android:endColor="#001018"/>
+        </shape>
+    </item>
+
+    <!-- Bottom linear blue sweep -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#163C74"
+                android:centerColor="#0E203A"
+                android:endColor="#00000000"/>
+        </shape>
+    </item>
+</layer-list>

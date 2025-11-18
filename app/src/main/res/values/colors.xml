@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_bg">#F7F9FB</color>
+
+    <!-- Primary Brand Colors -->
+    <color name="blue">#004A99</color>       <!-- Main Button / Title -->
+    <color name="blue_dark">#002F6C</color> <!-- Darker shade if needed -->
+    <color name="black">#004A99</color>
+    <!-- Neutral Colors -->
+    <color name="gray">#666666</color>       <!-- Subtitle, login text -->
+    <color name="gray_light">#D0D0D0</color> <!-- EditText border -->
+    <color name="navy">#1B294B</color>
+    <color name="bg_light">#F7F9FB</color>
+    <color name="dk_blue">#162449</color>
+
+    <!-- Backgrounds -->
+    <color name="background">#F9FAFB</color> <!-- Page background -->
+    <color name="white">#FFFFFF</color>      <!-- Input fields -->
+    <color name="wnc_blue">#2F5EAA</color>
+    <color name="wnc_text_secondary">#C1C7D0</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#666666</color>
+    <color name="primary">#2F5EAA</color>
+    <color name="dark_blue">#1B294B</color>
+    <color name="grey">#98A2B3</color>
+    <color name="muted_icon">#C1C7D0</color>
+
+    <color name="input_background">#1A2B4A</color>
+    <color name="input_stroke">#3A5A8A</color>
+    <color name="button_blue">#5B9FFF</color>
+
+    <color name="blue_200">#6C8CFF</color>
+    <color name="blue_400">#3C82FF</color>
+    <color name="blue_600">#335CFF</color>
+    <color name="dark_bg">#0D1B2A</color>
+    <color name="dark_card">#1A1A2E</color>
+    <color name="green_connected">#00FF00</color>
+    <color name="transparent_white_20">#33FFFFFF</color>
+
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+    <color name="c_neonGreen">#39FF14</color> <!-- bright neon green -->
+    <color name="c_textSoft">#99FFFFFF</color> <!-- soft white/gray for inactive text -->
+</resources>

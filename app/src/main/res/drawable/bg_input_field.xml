@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Background drawable for the phone number input field. It uses a translucent
+    dark fill with a light border and rounded corners to match the other
+    outlined fields.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#22000000"/>
+    <stroke
+        android:width="1dp"
+        android:color="#66FFFFFF"/>
+    <corners android:radius="8dp"/>
+</shape>

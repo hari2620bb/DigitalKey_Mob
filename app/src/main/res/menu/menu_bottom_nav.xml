@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_key"
+        android:title="Key"
+        android:icon="@drawable/ic_key"/>
+    <item
+        android:id="@+id/nav_status"
+        android:title="Status"
+        android:icon="@drawable/ic_scooter"/>
+    <item
+        android:id="@+id/nav_share"
+        android:title="Share"
+        android:icon="@drawable/ic_share"/>
+    <item
+        android:id="@+id/nav_map"
+        android:title="Map"
+        android:icon="@drawable/ic_map"/>
+    <item
+        android:id="@+id/nav_settings"
+        android:title="Settings"
+        android:icon="@drawable/ic_setting"/>
+</menu>

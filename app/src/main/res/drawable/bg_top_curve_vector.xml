@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="600dp"
+    android:viewportWidth="360"
+    android:viewportHeight="600">
+
+    <!-- Light section with a convex top arc -->
+    <path
+        android:fillColor="#F7F9FB"
+        android:pathData="
+            M0,600
+            H360
+            V70
+            Q180,30 0,70
+            Z"/>
+</vector>

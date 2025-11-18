@@ -1,0 +1,44 @@
+<resources>
+    <string name="home">Home</string>
+    <string name="share">Share</string>
+    <string name="key">Key</string>
+    <string name="profile">Profile</string>
+    <string name="notify">Notifications</string>
+    <string name="radar">Radar</string>
+    <string name="vehicle">Vehicle</string>
+    <string name="icon">Icon</string>
+    <string name="edit">Edit</string>
+    <string name="connect">Connect</string>
+    <string name="app_name">Digital Key</string>
+    <string name="keys">Keys</string>
+    <string name="back">Back</string>
+    <!-- res/values/strings.xml -->
+    <string name="success">Success</string>
+    <string name="pairing_successfully">Paired Successfully</string>
+    <string name="start_engine">Start Engine</string>
+    <string name="unlock">Unlock</string>
+    <string name="lock">Lock</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- res/values/strings.xml -->
+    <!--    <string name="app_name">WNC</string>-->
+    <string name="create_account">Create Account</string>
+    <string name="signup_subtitle">Sign up to get started</string>
+    <string name="hint_name">Enter Name</string>
+    <string name="hint_email">Enter Email</string>
+    <string name="hint_phone">Phone number</string>
+    <string name="hint_password">Password</string>
+    <string name="country_flag">Country flag</string>
+    <string name="select_country">Select country</string>
+    <string name="already_have_account">Already have an account?</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome!"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+
+</resources>

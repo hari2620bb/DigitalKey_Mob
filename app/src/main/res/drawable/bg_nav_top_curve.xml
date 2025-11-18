@@ -1,0 +1,39 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- faint side glows (rounded ends illusion) -->
+    <item android:gravity="left|center_vertical" android:width="36dp" android:height="24dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:centerX="0.3" android:centerY="0.5"
+                android:gradientRadius="28dp"
+                android:startColor="#2047A4FF"
+                android:endColor="#00000000"/>
+        </shape>
+    </item>
+
+    <item android:gravity="right|center_vertical" android:width="36dp" android:height="24dp">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:centerX="0.7" android:centerY="0.5"
+                android:gradientRadius="28dp"
+                android:startColor="#2047A4FF"
+                android:endColor="#00000000"/>
+        </shape>
+    </item>
+
+    <!-- the line -->
+    <item android:top="10dp" android:bottom="10dp">
+        <shape android:shape="rectangle">
+            <size android:height="3dp"/>
+            <corners android:radius="24dp"/>
+            <gradient
+                android:type="linear"
+                android:angle="0"
+                android:startColor="#3347A4FF"
+                android:centerColor="#66A6CFFF"
+                android:endColor="#3347A4FF"/>
+        </shape>
+    </item>
+</layer-list>
