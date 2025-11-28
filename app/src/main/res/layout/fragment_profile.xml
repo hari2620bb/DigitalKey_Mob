@@ -251,6 +251,7 @@
 
                         <!-- Logout -->
                         <LinearLayout
+                            android:id="@+id/rowLogout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -274,6 +275,7 @@
 
                         <!-- Change Email -->
                         <LinearLayout
+                            android:id="@+id/rowChangeEmail"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -297,6 +299,7 @@
 
                         <!-- Change Password -->
                         <LinearLayout
+                            android:id="@+id/rowChangePassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
@@ -351,17 +354,4 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/bg_bottom_nav"
-        app:menu="@menu/menu_bottom_nav"
-        app:itemIconSize="24dp"
-        app:itemIconTint="@color/bnv_color_selector"
-        app:itemTextColor="@color/bnv_color_selector"
-        app:itemRippleColor="@color/bnv_ripple_selector"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

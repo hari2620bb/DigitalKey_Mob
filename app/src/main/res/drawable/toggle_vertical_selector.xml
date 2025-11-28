@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- ON state -->
-    <item android:state_checked="true" android:drawable="@drawable/toggle_on"/>
-    <!-- OFF (default) -->
+
+    <!-- ON: knob at bottom -->
+    <item android:state_checked="true"
+        android:drawable="@drawable/toggle_on"/>
+
+    <!-- OFF: knob at top -->
     <item android:drawable="@drawable/toggle_off"/>
+
 </selector>

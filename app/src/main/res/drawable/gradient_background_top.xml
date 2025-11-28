@@ -8,28 +8,41 @@
         </shape>
     </item>
 
-    <!-- Top-left radial gradient -->
+    <!-- Top-left radial gradient with blur -->
     <item>
         <shape>
             <gradient
                 android:type="radial"
                 android:centerX="0.2"
                 android:centerY="0.2"
-                android:gradientRadius="220dp"
+                android:gradientRadius="280dp"
                 android:startColor="#3075DF"
                 android:endColor="@android:color/transparent" />
         </shape>
     </item>
 
-    <!-- Bottom-right radial gradient -->
+    <!-- Bottom-right radial gradient with blur -->
     <item>
         <shape>
             <gradient
                 android:type="radial"
                 android:centerX="0.9"
                 android:centerY="0.9"
-                android:gradientRadius="220dp"
+                android:gradientRadius="280dp"
                 android:startColor="#3075DF"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+
+    <!-- Additional subtle gradient for depth -->
+    <item>
+        <shape>
+            <gradient
+                android:type="radial"
+                android:centerX="0.5"
+                android:centerY="0.5"
+                android:gradientRadius="400dp"
+                android:startColor="#1A3075DF"
                 android:endColor="@android:color/transparent" />
         </shape>
     </item>

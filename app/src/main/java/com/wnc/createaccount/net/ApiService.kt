@@ -1,7 +1,13 @@
 package com.wnc.createaccount.net
 
+import com.wnc.createaccount.models.FriendPermissionResponse
+import com.wnc.createaccount.models.FriendsListResponse
 import com.wnc.createaccount.models.LinkVinRequest
 import com.wnc.createaccount.models.LinkVinResponse
+import com.wnc.createaccount.models.SendFriendPermissionRequest
+import com.wnc.createaccount.models.SendFriendPermissionResponse
+import com.wnc.createaccount.models.ShareFriendRequest
+import com.wnc.createaccount.models.ShareFriendResponse
 import com.wnc.createaccount.models.SignInRequest
 import com.wnc.createaccount.models.SignInResponse
 import com.wnc.createaccount.models.SignupRequest
@@ -48,4 +54,29 @@ interface ApiService {
         @Path("userId") userId: String?,
         @Path("vin") vin: String
     ): retrofit2.Response<UserVehiclesResponse>
+
+
+    @POST("/landing/v1/post-shared-digital-key") // your Node.js endpoint
+    suspend fun postShareDigitalKey(
+        @Header("Authorization") auth: String?,
+        @Body request: ShareFriendRequest
+    ): Response<ShareFriendResponse>
+
+    @GET("landing/v1/get-user-permissions")
+    suspend fun getFriendPermissionList(
+        @Header("Authorization") auth: String?
+    ): Response<FriendPermissionResponse>
+
+    @POST("landing/v1/post-key-shared-friend-details")
+    suspend fun postPermissionList(
+        @Header("Authorization") auth: String?,
+        @Body request: SendFriendPermissionRequest
+    ): Response<SendFriendPermissionResponse>
+
+    @GET("landing/v1/vehicle-shared-details/{vin}")
+    suspend fun getFriendList(
+        @Header("Authorization") auth: String?,
+        @Path("vin") vin: String?
+    ): Response<FriendsListResponse> // <-- use the wrapper class
+
 }

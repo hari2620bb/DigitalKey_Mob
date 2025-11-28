@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center"
-    android:paddingVertical="4dp">
+    android:paddingVertical="4dp"
+    android:layout_marginHorizontal="4dp">
 
     <!-- glassy circle with icon -->
     <FrameLayout

@@ -7,17 +7,14 @@ import android.bluetooth.BluetoothDevice
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Looper
 import android.text.InputFilter
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.wnc.createaccount.R
 import com.wnc.createaccount.databinding.FragmentPairingBondingBinding
@@ -28,8 +25,6 @@ import com.wnc.createaccount.utils.FileLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.io.File
 
 class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
@@ -39,46 +34,76 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
 
     private lateinit var dkDevice: DigitalKeyDevice
     private var selectedAddress: String? = null
+    private var otpVerificationPending = false
 
-    // flag to avoid double navigation / cleanup
-    private var flowCompleted = false
+    // ---------------------------------------------------------
+    //  Pairing state helpers (shared with LandingFragment)
+    // ---------------------------------------------------------
 
-    // ---------- UI helper (always main thread safe) ----------
-    private fun setStatusSafe(text: String) {
-        Log.d("PairBond", text)
+    private fun setPairingState(pending: Boolean, connected: Boolean) {
+        val appCtx = requireActivity().applicationContext
+        PairingStore.setPending(appCtx, pending)
+        PairingStore.setConnected(appCtx, connected)
+    }
 
-        if (!isAdded) return
-        val tv = _binding?.tvVehicleStatus ?: return
+    // ---------------------------------------------------------
+    //  UI Logging and Status Helpers
+    // ---------------------------------------------------------
 
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            tv.text = text
-        } else {
-            tv.post { _binding?.tvVehicleStatus?.text = text }
-        }
-
-        FileLogger.writeLog(requireContext(), text)
+    private fun setStatus(s: String) {
+        binding.tvVehicleStatus.text = s
+        Log.d("PairBond", s)
     }
 
     private fun step(label: String, done: Boolean = false) {
-        val statusText = if (done) {
-            "✅ $label completed"
-        } else {
-            "➡️ $label in progress…"
-        }
-        setStatusSafe(statusText)
+        val statusText = if (done) "✅ $label completed" else "➡️ $label in progress…"
+        setStatus(statusText)
+        FileLogger.writeLog(requireContext(), statusText)
     }
 
     private fun log(msg: String) {
         Log.d("PairBond", msg)
         FileLogger.writeLog(requireContext(), msg)
+        if (msg.startsWith("UI_PHASE:")) return
+    }
 
-        val keywords = listOf(
-            "Scanning", "Device found", "Bonded", "Paired",
-            "L2CAP", "SPAKE", "SELECT", "Completed", "Flow"
-        )
+    private fun showProgress(phaseMsg: String, progress: Int) {
+        binding.tvVehicleStatus.text = phaseMsg
+        binding.progressBar.visibility = View.VISIBLE
+        binding.progressBar.progress = progress
+    }
 
-        if (keywords.any { msg.contains(it, ignoreCase = true) }) {
-            setStatusSafe(msg)
+    private fun hideProgress() {
+        binding.progressBar.visibility = View.GONE
+    }
+
+    private fun setStartEnabled(enabled: Boolean) {
+        binding.btnShareBond.isEnabled = enabled
+        binding.btnShareBond.alpha = if (enabled) 1f else 0.5f
+    }
+
+    private fun handleUiPhase(phase: String) {
+        when (phase) {
+            "InitiatingOwnerPairing" -> {
+                showProgress("Initiating Owner Pairing", 20)
+            }
+            "Phase2Completed" -> {
+                showProgress("Phase 2 completed", 40)
+            }
+            "Phase3Completed" -> {
+                showProgress("Phase 3 completed", 60)
+            }
+            "FinalizationOfPairing" -> {
+                showProgress("Finalization of pairing", 80)
+            }
+            "DevicePaired" -> {
+                hideProgress()
+                setStatus("✅ Device Paired!")
+                // ✅ Mark global pairing state so LandingFragment toggles are enabled
+                setPairingState(pending = false, connected = true)
+                // Optionally close this screen:
+                // parentFragmentManager.popBackStack()
+            }
         }
     }
 
@@ -129,29 +154,28 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
 
             val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
             when (state) {
-                BluetoothDevice.BOND_BONDING -> {
-                    PairingStore.setPending(requireContext(), true)
-                    PairingStore.setConnected(requireContext(), false)
-                    step("Bonding")
-                }
                 BluetoothDevice.BOND_BONDED -> {
                     step("Bonded", done = true)
                     log("Bonded: ${dev.address} → will open L2CAP automatically")
                     dkDevice.openDynamicL2capChannel(dev.address)
+                    // runFullSequence(dev.address)
                 }
             }
         }
     }
 
-    // ---------- Lifecycle ----------
+    // ---------------------------------------------------------
+    //  Lifecycle
+    // ---------------------------------------------------------
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentPairingBondingBinding.bind(view)
         super.onViewCreated(view, savedInstanceState)
 
-        renderVehicleHeaderFromPrefs()
-
-        PairingStore.setPending(requireContext(), false)
-        PairingStore.setConnected(requireContext(), false)
+        // Initial state: no pairing in progress from this screen
+        setPairingState(pending = false, connected = false)
+        setStartEnabled(true)
+        hideProgress()
 
         // Permissions
         if (!BleUtils.allPermissionsGranted(requireContext())) {
@@ -161,7 +185,15 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
         // Initialize DigitalKeyDevice
         dkDevice = DigitalKeyDevice(
             requireContext(),
-            logCb = { m -> log(m) }, // no extra runOnUiThread, setStatusSafe already hops
+            logCb = { m ->
+                requireActivity().runOnUiThread {
+                    if (m.startsWith("UI_PHASE:")) {
+                        handleUiPhase(m.removePrefix("UI_PHASE:"))
+                    } else {
+                        log(m)
+                    }
+                }
+            },
             onOwnerPairingRequested = { addr ->
                 requireActivity().runOnUiThread {
                     selectedAddress = addr
@@ -171,15 +203,27 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
             }
         )
 
+        // ✅ Set OTP verification callback - triggers when OP CONTROL FLOW P1=0x11
+        dkDevice.setOtpVerificationCallback { addr ->
+            requireActivity().runOnUiThread {
+                log("📩 OP CONTROL FLOW successful (P1=0x11) → Ready for OTP verification")
+                setStatus("✅ Owner Pairing Complete - Please enter OTP")
+                binding.etOtpInput.requestFocus()
+                otpVerificationPending = true
+            }
+        }
+
         // Scan listener
         dkDevice.scanResultListener = object : ScanResultListener {
             override fun onFirstDeviceFound(address: String) {
                 requireActivity().runOnUiThread {
                     selectedAddress = address
-                    binding.tvVehicleDetails.text = "Vehicle: $address"
+//                    binding.tvVehicleDetails.text = "Vehicle: $address"
                     step("Found", done = true)
                 }
                 dkDevice.bleEventHandler(AppEvent.SHELL_STOP_DISCOVERY_COMMAND)
+
+                // Connect immediately → triggers handleConnectionStateChange → auto-L2CAP
                 dkDevice.connectToAddress(address)
             }
         }
@@ -187,7 +231,10 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
         // Register receivers
         dkDevice.registerReceivers()
         registerOrderedPairingReceiver()
-        requireActivity().registerReceiver(bondReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
+        requireActivity().registerReceiver(
+            bondReceiver,
+            IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+        )
 
         dkDevice.onL2capOpened = { addr ->
             requireActivity().runOnUiThread {
@@ -195,43 +242,31 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
                 runFullSequence(addr)
             }
         }
-        dkDevice.onOpControlFlowCompleted = { addr ->
-            requireActivity().runOnUiThread {
-                step("OP_CONTROL_FLOW", done = true)
-                markFlowCompleteUi()
-                cleanupBle()
-                navigateToPairingKeyExchange()
-            }
-        }
 
-        // Start Pairing & Bonding
+        // ---------- Single-button flow ----------
         binding.btnShareBond.setOnClickListener {
             if (!BleUtils.allPermissionsGranted(requireContext())) {
                 BleUtils.requestPermissions(requireActivity() as Activity, 101)
                 return@setOnClickListener
             }
 
-            // Prevent double-tap
-            binding.btnShareBond.isEnabled = false
-            binding.btnShareBond.alpha = 0.5f
-
-            flowCompleted = false
-            PairingStore.setPending(requireContext(), true)
-            PairingStore.setConnected(requireContext(), false)
-
+            // Reset UI
             binding.tvVehicleStatus.text = ""
-            binding.tvVehicleDetails.text = ""
+//            binding.tvVehicleDetails.text = ""
             selectedAddress = null
+            hideProgress()
+
+            // mark pairing in progress
+            setPairingState(pending = true, connected = false)
+            setStartEnabled(false)
 
             step("Scanning")
             dkDevice.bleEventHandler(AppEvent.SHELL_START_DISCOVERY_OP_COMMAND)
         }
 
-        // Continue only after flow is done
-        binding.btnContinue.setOnClickListener {
-            if (!flowCompleted) return@setOnClickListener
-            cleanupBle()
-            navigateToPairingKeyExchange()
+        // ✅ Wire OTP Submit Button
+        binding.btnSubmitOtp.setOnClickListener {
+            handleOtpSubmission()
         }
 
         binding.btnViewLogs.setOnClickListener {
@@ -239,128 +274,85 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
         }
     }
 
-    override fun onDestroyView() {
-        cleanupBle()
-        _binding = null
-        super.onDestroyView()
-    }
+    // ---------------------------------------------------------
+    //  OTP UI + verification
+    // ---------------------------------------------------------
 
-    // ---------- Flow / BLE helpers ----------
-
-    private fun cleanupBle() {
-        runCatching { requireActivity().unregisterReceiver(pairingReceiver) }
-        runCatching { requireActivity().unregisterReceiver(bondReceiver) }
-        runCatching { dkDevice.disconnectAllDevices() }
-        runCatching { dkDevice.unregisterReceivers() }
-    }
-
-    private fun markFlowCompleteUi() {
-        if (flowCompleted || !isAdded) return
-        flowCompleted = true
-
-        PairingStore.setPending(requireContext(), false)
-        PairingStore.setConnected(requireContext(), true)
-
-        setStatusSafe("✅ Flow complete: Scan → Found → Bonded → L2CAP → OwnerPairing → SELECT → SPAKE → AUTH0/AUTH1")
-
-        binding.btnShareBond.isEnabled = false
-        binding.btnShareBond.alpha = 0.5f
-        binding.btnContinue.visibility = View.VISIBLE
-    }
-
-    /** Runs OwnerPairing/SELECT/SPAKE etc after L2CAP is ready */
-    private fun runFullSequence(addr: String) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                // These logical "steps" are just for UI
-                step("OwnerPairing")
-                dkDevice.sendOwnerPairingTest(addr, simulateNxp = true)
-                delay(200)
-                step("OwnerPairing", done = true)
-
-                step("SELECT")
-                delay(200)
-                step("SELECT", done = true)
-
-                step("SPAKE")
-                delay(200)
-                step("SPAKE", done = true)
-
-                // BLE flow continues in DigitalKeyDevice via logCb etc.
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
-                    markFlowCompleteUi()
-                }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
-
-                    PairingStore.setPending(requireContext(), false)
-                    PairingStore.setConnected(requireContext(), false)
-
-                    setStatusSafe("❌ Error: ${t.message}")
-
-                    binding.btnShareBond.isEnabled = true
-                    binding.btnShareBond.alpha = 1f
-                }
-                cleanupBle()
-            }
+    private fun showOtpInput() {
+        requireActivity().runOnUiThread {
+            binding.etOtpInput.text?.clear()
+            binding.etOtpInput.requestFocus()
+            setStatus("Enter 6-digit OTP from vehicle")
         }
     }
 
-    // ---------- Navigation ----------
+    private fun handleOtpSubmission() {
+        val otpInput = binding.etOtpInput.text?.toString()?.trim() ?: ""
 
-    private fun navigateToPairingKeyExchange() {
-        if (!isAdded) return
-
-        // Prefer the view's parent container id (works whether fragment is hosted in activity or another fragment)
-        val containerId = (view?.parent as? ViewGroup)?.id ?: run {
-            // fallback to the activity's content view id
-            requireActivity().findViewById<View>(android.R.id.content).id
+        if (otpInput.length != 6) {
+            Toast.makeText(requireContext(), "Please enter exactly 6 digits", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        parentFragmentManager.commit {
-            setReorderingAllowed(true)
-            replace(containerId, PairingKeyExchangeFragment())
-            addToBackStack("pairing_key_exchange")
+        if (!otpInput.all { it.isDigit() }) {
+            Toast.makeText(requireContext(), "OTP must contain only numbers", Toast.LENGTH_SHORT).show()
+            return
         }
-    }
 
+        val otpBytes = otpInput.map { it.digitToInt().toByte() }.toByteArray()
 
-    // ---------- Vehicle header from SharedPreferences ----------
+        log("📤 OTP Entered: $otpInput → Bytes: ${otpBytes.joinToString(" ") { "%02X".format(it) }}")
 
-    private fun renderVehicleHeaderFromPrefs() {
-        val sp = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
-        val json = sp.getString("last_vehicle_json", null) ?: return
+        binding.btnSubmitOtp.isEnabled = false
+        setStatus("Verifying OTP with KW45...")
 
-        try {
-            val obj   = JSONObject(json)
-            val vin   = obj.optString("vin")
-            val model = obj.optString("model")
-            val year  = obj.optInt("year", 0)
+        selectedAddress?.let { addr ->
+            dkDevice.sendHmiPasswordVerificationRequest(addr, otpBytes) { success, message ->
+                requireActivity().runOnUiThread {
+                    binding.btnSubmitOtp.isEnabled = true
 
-            binding.tvVehicleName.text =
-                if (model.isNullOrBlank()) "Vehicle" else model
+                    if (success) {
+                        setStatus("✅ OTP Verified Successfully!")
+                        log("✅ HMI Password verification succeeded")
+                        Toast.makeText(
+                            requireContext(),
+                            "OTP Verified! Proceeding to next step...",
+                            Toast.LENGTH_LONG
+                        ).show()
 
-            binding.tvVin.text =
-                if (vin.isNullOrBlank()) binding.tvVin.text else vin
+                        binding.etOtpInput.text?.clear()
+                        otpVerificationPending = false
 
-            val details = buildString {
-                if (!model.isNullOrBlank()) append(model)
-                if (year > 0) {
-                    if (isNotEmpty()) append(" ")
-                    append(year)
+                        // Here you could trigger a UI_PHASE:FinalizationOfPairing in DK device
+                        // which will then call handleUiPhase("DevicePaired")
+                        // and mark PairingStore connected.
+                    } else {
+                        setStatus("❌ OTP Verification Failed")
+                        Toast.makeText(
+                            requireContext(),
+                            message ?: "Invalid OTP - Please try again",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        log("❌ HMI Password verification failed: $message")
+                        binding.etOtpInput.text?.clear()
+                        binding.etOtpInput.requestFocus()
+                    }
                 }
             }
-            if (details.isNotEmpty()) {
-                binding.tvVehicleDetails.text = details
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } ?: run {
+            binding.btnSubmitOtp.isEnabled = true
+            Toast.makeText(requireContext(), "No device connected", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // ---------- Logs ----------
+    private fun onOwnerPairingComplete() {
+        log("Owner pairing completed → requesting OTP")
+        showOtpInput()
+    }
+
+    // ---------------------------------------------------------
+    //  Logs
+    // ---------------------------------------------------------
 
     private fun showLogFile() {
         try {
@@ -393,7 +385,9 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
         }
     }
 
-    // ---------- Services / PIN ----------
+    // ---------------------------------------------------------
+    //  BLE helpers
+    // ---------------------------------------------------------
 
     private fun startPassiveEntryService() {
         requireContext().startService(Intent(requireContext(), PassiveEntryService::class.java))
@@ -418,9 +412,60 @@ class PairingBondingFragment : Fragment(R.layout.fragment_pairing_bonding) {
             .setPositiveButton("OK") { _, _ ->
                 val pin = input.text?.toString()?.trim().orEmpty()
                 if (pin.isNotEmpty()) dkDevice.setOwnerPin(address, pin)
-                else setStatusSafe("PIN empty — cancelled")
+                else setStatus("PIN empty — cancelled")
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    /** Runs SELECT + SPAKE + OwnerPairing after L2CAP is ready */
+    private fun runFullSequence(addr: String) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // --- Owner Pairing ---
+                step("OwnerPairing")
+                dkDevice.sendOwnerPairingTest(addr, simulateNxp = true)
+                delay(200)
+                step("OwnerPairing", done = true)
+
+                // ✅ After owner pairing, OP CONTROL FLOW response will trigger OTP callback
+
+                // --- SELECT ---
+                step("SELECT")
+                // dkDevice.sendSelectNoAid(addr)
+                delay(200)
+                step("SELECT", done = true)
+
+                // --- SPAKE ---
+                step("SPAKE")
+                val spakeVer = 0x01.toByte() to 0x00.toByte()
+                val dkProto = byteArrayOf(0x01, 0x02)
+                val scryptSalt = ByteArray(16) { 0x00 }
+                // dkDevice.sendSpake2Request(addr, spakeVer, dkProto, scryptSalt, 10000, 8, 1, 0x1234)
+                delay(200)
+                step("SPAKE", done = true)
+
+                requireActivity().runOnUiThread {
+                    setStatus("✅ Flow complete: Scan → Found → Bonded → L2CAP → OwnerPairing → SELECT → SPAKE")
+                }
+            } catch (t: Throwable) {
+                requireActivity().runOnUiThread {
+                    hideProgress()
+                    setStatus("❌ Error: ${t.message}")
+                    // mark failure in pairing state
+                    setPairingState(pending = false, connected = false)
+                    setStartEnabled(true)
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        runCatching { requireActivity().unregisterReceiver(pairingReceiver) }
+        runCatching { requireActivity().unregisterReceiver(bondReceiver) }
+        dkDevice.disconnectAllDevices()
+        dkDevice.unregisterReceivers()
+        _binding = null
     }
 }

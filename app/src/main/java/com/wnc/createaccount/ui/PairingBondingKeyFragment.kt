@@ -148,11 +148,14 @@ class PairingBondingKeyFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            PairingStore.setPending(requireContext(), false)
-            PairingStore.setConnected(requireContext(), true)
+            // Use application context so every fragment reads the same shared prefs instance immediately.
+            val appCtx = requireActivity().applicationContext
+            PairingStore.setPending(appCtx, false)
+            PairingStore.setConnected(appCtx, true)
 
-            // TODO: validate OTP with server here if needed.
+    // TODO: validate OTP with server here if needed.
             goToPairingKeyExchange(vinArg)
+
         }
 
     }

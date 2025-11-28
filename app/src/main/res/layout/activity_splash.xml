@@ -4,16 +4,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background_top">
+    android:background="@drawable/gradient_background_top"
+    android:padding="40dp">
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:src="@drawable/bb_logo"
         android:tint="#fff"
+        android:alpha="0.9"
+        android:scaleType="centerInside"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        app:layout_constraintWidth_max="250dp"
+        app:layout_constraintHeight_max="250dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
